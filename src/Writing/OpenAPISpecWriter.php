@@ -592,12 +592,16 @@ class OpenAPISpecWriter
             ];
         }
 
+        $path = ltrim($path, 'data.'); // Remove 'data.' prefix, if set
         $schema = [
             'type' => $this->convertScribeOrPHPTypeToOpenAPIType(gettype($value)),
             'example' => $value,
         ];
-        if (isset($endpoint->responseFields[$path]->description)) {
+        if ($endpoint->responseFields[$path]->description ?? false) {
             $schema['description'] = $endpoint->responseFields[$path]->description;
+        }
+        if ($endpoint->responseFields[$path]->enumValues ?? false) {
+            $schema['enum'] = $endpoint->responseFields[$path]->enumValues;
         }
 
         if ($schema['type'] === 'array' && !empty($value)) {
